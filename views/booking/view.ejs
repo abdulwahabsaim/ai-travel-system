@@ -1,0 +1,121 @@
+<div class="container">
+    <div class="dashboard-header">
+        <h1>Booking Details</h1>
+        <p>View and manage your booking information</p>
+        <div class="dashboard-actions">
+            <a href="/booking/<%= booking._id %>/edit" class="btn btn-outline">
+                <i class="fas fa-edit"></i> Edit Booking
+            </a>
+            <a href="/booking" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Bookings
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2><%= booking.provider.name %></h2>
+            <span class="status-badge status-<%= booking.status %>"><%= booking.status %></span>
+        </div>
+        <div class="card-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h3>Booking Information</h3>
+                    <p><strong>Booking Reference:</strong> <%= booking.bookingReference %></p>
+                    <p><strong>Type:</strong> <%= booking.bookingType.charAt(0).toUpperCase() + booking.bookingType.slice(1) %></p>
+                    <p><strong>Payment Method:</strong> <%= booking.paymentMethod.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) %></p>
+                    <p><strong>Payment Status:</strong> <span class="status-badge status-<%= booking.paymentStatus %>"><%= booking.paymentStatus %></span></p>
+                    
+                    <% if (booking.itinerary) { %>
+                        <p><strong>Related Itinerary:</strong> <a href="/itinerary/<%= booking.itinerary._id %>"><%= booking.itinerary.title %></a></p>
+                    <% } %>
+                </div>
+                
+                <div>
+                    <h3>Pricing</h3>
+                    <p><strong>Base Price:</strong> $<%= booking.pricing.basePrice.toFixed(2) %></p>
+                    <p><strong>Taxes:</strong> $<%= booking.pricing.taxes.toFixed(2) %></p>
+                    <p><strong>Fees:</strong> $<%= booking.pricing.fees.toFixed(2) %></p>
+                    <p><strong>Total Price:</strong> <strong>$<%= booking.pricing.totalPrice.toFixed(2) %></strong></p>
+                    <p><strong>Currency:</strong> <%= booking.pricing.currency %></p>
+                </div>
+            </div>
+
+            <% if (booking.details.from || booking.details.to) { %>
+                <div style="margin-top: 30px;">
+                    <h3>Travel Details</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <% if (booking.details.from && booking.details.to) { %>
+                            <div>
+                                <p><strong>From:</strong> <%= booking.details.from %></p>
+                                <p><strong>To:</strong> <%= booking.details.to %></p>
+                            </div>
+                        <% } %>
+                        
+                        <div>
+                            <% if (booking.details.departureDate) { %>
+                                <p><strong>Departure Date:</strong> <%= new Date(booking.details.departureDate).toLocaleDateString() %></p>
+                            <% } %>
+                            <% if (booking.details.returnDate) { %>
+                                <p><strong>Return Date:</strong> <%= new Date(booking.details.returnDate).toLocaleDateString() %></p>
+                            <% } %>
+                            <% if (booking.details.duration) { %>
+                                <p><strong>Duration:</strong> <%= booking.details.duration %></p>
+                            <% } %>
+                        </div>
+                    </div>
+                    
+                    <% if (booking.details.departureTime || booking.details.arrivalTime) { %>
+                        <div style="margin-top: 20px;">
+                            <% if (booking.details.departureTime) { %>
+                                <p><strong>Departure Time:</strong> <%= booking.details.departureTime %></p>
+                            <% } %>
+                            <% if (booking.details.arrivalTime) { %>
+                                <p><strong>Arrival Time:</strong> <%= booking.details.arrivalTime %></p>
+                            <% } %>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+
+            <div style="margin-top: 30px;">
+                <h3>Provider Information</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                    <div>
+                        <p><strong>Name:</strong> <%= booking.provider.name %></p>
+                        <% if (booking.provider.contact.phone) { %>
+                            <p><strong>Phone:</strong> <%= booking.provider.contact.phone %></p>
+                        <% } %>
+                    </div>
+                    <div>
+                        <% if (booking.provider.contact.email) { %>
+                            <p><strong>Email:</strong> <%= booking.provider.contact.email %></p>
+                        <% } %>
+                        <% if (booking.provider.contact.website) { %>
+                            <p><strong>Website:</strong> <a href="<%= booking.provider.contact.website %>" target="_blank"><%= booking.provider.contact.website %></a></p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+
+            <% if (booking.specialRequests) { %>
+                <div style="margin-top: 30px;">
+                    <h3>Special Requests</h3>
+                    <p><%= booking.specialRequests %></p>
+                </div>
+            <% } %>
+
+            <% if (booking.notes) { %>
+                <div style="margin-top: 30px;">
+                    <h3>Notes</h3>
+                    <p><%= booking.notes %></p>
+                </div>
+            <% } %>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                <p><strong>Created:</strong> <%= new Date(booking.createdAt).toLocaleString() %></p>
+                <p><strong>Last Updated:</strong> <%= new Date(booking.updatedAt).toLocaleString() %></p>
+            </div>
+        </div>
+    </div>
+</div> 

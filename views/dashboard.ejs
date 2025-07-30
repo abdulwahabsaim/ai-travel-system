@@ -1,0 +1,335 @@
+<div class="container">
+    <div class="dashboard">
+        <div class="dashboard-header">
+            <h1>Welcome back, <%= user.firstName %>!</h1>
+            <p>Here's your travel overview and quick actions</p>
+        </div>
+        
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="itinerary-count">-</div>
+                <div class="stat-label">Active Itineraries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="booking-count">-</div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="total-spent">$0</div>
+                <div class="stat-label">Total Spent</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="upcoming-trips">-</div>
+                <div class="stat-label">Upcoming Trips</div>
+            </div>
+        </div>
+        
+        <div class="dashboard-actions">
+            <a href="/itinerary/create" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Create New Itinerary
+            </a>
+            <a href="/booking/create" class="btn btn-secondary">
+                <i class="fas fa-calendar-plus"></i>
+                Add New Booking
+            </a>
+            <a href="/itinerary" class="btn btn-outline">
+                <i class="fas fa-route"></i>
+                View All Itineraries
+            </a>
+            <a href="/booking" class="btn btn-outline">
+                <i class="fas fa-list"></i>
+                View All Bookings
+            </a>
+        </div>
+        
+        <div class="dashboard-content">
+            <div class="dashboard-grid">
+                <div class="dashboard-section">
+                    <h2>Recent Itineraries</h2>
+                    <div class="list-container">
+                        <div class="list-header">
+                            <h3>Your Travel Plans</h3>
+                            <a href="/itinerary" class="btn btn-sm btn-outline">View All</a>
+                        </div>
+                        <div id="recent-itineraries">
+                            <div class="list-item">
+                                <div class="loading">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-section">
+                    <h2>Recent Bookings</h2>
+                    <div class="list-container">
+                        <div class="list-header">
+                            <h3>Your Reservations</h3>
+                            <a href="/booking" class="btn btn-sm btn-outline">View All</a>
+                        </div>
+                        <div id="recent-bookings">
+                            <div class="list-item">
+                                <div class="loading">Loading...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-section">
+                <h2>AI Travel Assistant</h2>
+                <div class="ai-assistant">
+                    <div class="ai-card">
+                        <div class="ai-header">
+                            <i class="fas fa-robot"></i>
+                            <h3>Smart Recommendations</h3>
+                        </div>
+                        <div class="ai-content">
+                            <p>Get personalized travel suggestions based on your preferences and past trips.</p>
+                            <div class="ai-actions">
+                                <button class="btn btn-primary" onclick="generateRecommendations()">
+                                    <i class="fas fa-magic"></i>
+                                    Get AI Suggestions
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ai-card">
+                        <div class="ai-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Cost Predictions</h3>
+                        </div>
+                        <div class="ai-content">
+                            <p>Predict travel costs and find the best deals for your upcoming trips.</p>
+                            <div class="ai-actions">
+                                <button class="btn btn-secondary" onclick="predictCosts()">
+                                    <i class="fas fa-calculator"></i>
+                                    Predict Costs
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.dashboard-section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #2d3748;
+}
+
+.ai-assistant {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.ai-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #667eea;
+}
+
+.ai-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.ai-header i {
+    font-size: 2rem;
+    color: #667eea;
+}
+
+.ai-header h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.ai-content p {
+    color: #718096;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.ai-actions {
+    display: flex;
+    gap: 10px;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .ai-assistant {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// Load dashboard data
+document.addEventListener('DOMContentLoaded', function() {
+    loadDashboardData();
+});
+
+async function loadDashboardData() {
+    try {
+        // Load recent itineraries
+        const itinerariesResponse = await fetch('/itinerary/api/recent');
+        const itinerariesData = await itinerariesResponse.json();
+        
+        const recentItinerariesDiv = document.getElementById('recent-itineraries');
+        if (itinerariesData.success && itinerariesData.itineraries.length > 0) {
+            recentItinerariesDiv.innerHTML = '';
+            itinerariesData.itineraries.forEach(itinerary => {
+                const itineraryItem = document.createElement('div');
+                itineraryItem.className = 'list-item';
+                itineraryItem.innerHTML = `
+                    <div class="item-content">
+                        <h4>${itinerary.title}</h4>
+                        <p><strong>Destination:</strong> ${itinerary.destination}</p>
+                        <p><strong>Dates:</strong> ${new Date(itinerary.startDate).toLocaleDateString()} - ${new Date(itinerary.endDate).toLocaleDateString()}</p>
+                        <p><strong>Budget:</strong> $${itinerary.budget}</p>
+                        <p><strong>Status:</strong> <span class="status-badge status-${itinerary.status}">${itinerary.status}</span></p>
+                    </div>
+                    <div class="item-actions">
+                        <a href="/itinerary/${itinerary._id}" class="btn btn-sm btn-primary">View</a>
+                    </div>
+                `;
+                recentItinerariesDiv.appendChild(itineraryItem);
+            });
+        } else {
+            recentItinerariesDiv.innerHTML = '<div class="list-item"><p>No itineraries yet. <a href="/itinerary/create">Create your first one!</a></p></div>';
+        }
+        
+        // Load recent bookings
+        const bookingsResponse = await fetch('/booking/api/recent');
+        const bookingsData = await bookingsResponse.json();
+        
+        const recentBookingsDiv = document.getElementById('recent-bookings');
+        if (bookingsData.success && bookingsData.bookings.length > 0) {
+            recentBookingsDiv.innerHTML = '';
+            bookingsData.bookings.forEach(booking => {
+                const bookingItem = document.createElement('div');
+                bookingItem.className = 'list-item';
+                bookingItem.innerHTML = `
+                    <div class="item-content">
+                        <h4>${booking.bookingType.charAt(0).toUpperCase() + booking.bookingType.slice(1)} Booking</h4>
+                        <p><strong>Provider:</strong> ${booking.provider.name}</p>
+                        <p><strong>Itinerary:</strong> ${booking.itinerary ? booking.itinerary.title : 'N/A'}</p>
+                        <p><strong>Total:</strong> $${booking.pricing.totalPrice}</p>
+                        <p><strong>Status:</strong> <span class="status-badge status-${booking.status}">${booking.status}</span></p>
+                    </div>
+                    <div class="item-actions">
+                        <a href="/booking/${booking._id}" class="btn btn-sm btn-primary">View</a>
+                    </div>
+                `;
+                recentBookingsDiv.appendChild(bookingItem);
+            });
+        } else {
+            recentBookingsDiv.innerHTML = '<div class="list-item"><p>No bookings yet. <a href="/booking/create">Add your first booking!</a></p></div>';
+        }
+        
+        // Update stats
+        document.getElementById('itinerary-count').textContent = itinerariesData.success ? itinerariesData.itineraries.length : '0';
+        document.getElementById('booking-count').textContent = bookingsData.success ? bookingsData.bookings.length : '0';
+        
+        // Calculate total spent from bookings
+        let totalSpent = 0;
+        if (bookingsData.success) {
+            totalSpent = bookingsData.bookings.reduce((sum, booking) => sum + booking.pricing.totalPrice, 0);
+        }
+        document.getElementById('total-spent').textContent = `$${totalSpent.toLocaleString()}`;
+        
+        // Count upcoming trips (itineraries with future start dates)
+        let upcomingTrips = 0;
+        if (itinerariesData.success) {
+            const now = new Date();
+            upcomingTrips = itinerariesData.itineraries.filter(itinerary => 
+                new Date(itinerary.startDate) > now
+            ).length;
+        }
+        document.getElementById('upcoming-trips').textContent = upcomingTrips;
+        
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+    }
+}
+
+async function generateRecommendations() {
+    try {
+        const response = await fetch('/ai/suggest-itinerary', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                destination: 'Paris',
+                startDate: '2024-06-01',
+                endDate: '2024-06-07',
+                budget: 2000,
+                travelStyle: 'cultural',
+                interests: 'museums, food, art'
+            })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('AI recommendations generated! Check your itineraries.');
+        } else {
+            alert('Error generating recommendations. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error generating recommendations. Please try again.');
+    }
+}
+
+async function predictCosts() {
+    try {
+        const response = await fetch('/ai/predict-costs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                destination: 'Paris',
+                startDate: '2024-06-01',
+                endDate: '2024-06-07',
+                travelStyle: 'cultural',
+                accommodationType: 'hotel'
+            })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            const predictions = result.predictions;
+            alert(`Cost Predictions:\nAccommodation: $${predictions.accommodation}\nTransportation: $${predictions.transportation}\nActivities: $${predictions.activities}\nFood: $${predictions.food}\nTotal: $${predictions.total}`);
+        } else {
+            alert('Error predicting costs. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error predicting costs. Please try again.');
+    }
+}
+</script> 

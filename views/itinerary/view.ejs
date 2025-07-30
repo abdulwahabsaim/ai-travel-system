@@ -1,0 +1,144 @@
+<div class="container">
+    <div class="dashboard-header">
+        <h1><%= itinerary.title %></h1>
+        <p><%= itinerary.destination %> • <%= new Date(itinerary.startDate).toLocaleDateString() %> - <%= new Date(itinerary.endDate).toLocaleDateString() %></p>
+        <div class="dashboard-actions">
+            <a href="/itinerary/<%= itinerary._id %>/edit" class="btn btn-outline">
+                <i class="fas fa-edit"></i> Edit Itinerary
+            </a>
+            <a href="/booking/create?itineraryId=<%= itinerary._id %>" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Booking
+            </a>
+            <a href="/itinerary" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Itineraries
+            </a>
+        </div>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-number">$<%= itinerary.budget.toFixed(2) %></div>
+            <div class="stat-label">Budget</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">$<%= itinerary.totalCost.toFixed(2) %></div>
+            <div class="stat-label">Total Cost</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number"><%= itinerary.days ? itinerary.days.length : 0 %></div>
+            <div class="stat-label">Days</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number"><%= itinerary.travelStyle.charAt(0).toUpperCase() + itinerary.travelStyle.slice(1) %></div>
+            <div class="stat-label">Style</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Itinerary Details</h2>
+            <span class="status-badge status-<%= itinerary.status %>"><%= itinerary.status %></span>
+        </div>
+        <div class="card-content">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h3>Basic Information</h3>
+                    <p><strong>Title:</strong> <%= itinerary.title %></p>
+                    <p><strong>Destination:</strong> <%= itinerary.destination %></p>
+                    <p><strong>Travel Style:</strong> <%= itinerary.travelStyle.charAt(0).toUpperCase() + itinerary.travelStyle.slice(1) %></p>
+                    <p><strong>Status:</strong> <span class="status-badge status-<%= itinerary.status %>"><%= itinerary.status %></span></p>
+                </div>
+                
+                <div>
+                    <h3>Dates & Budget</h3>
+                    <p><strong>Start Date:</strong> <%= new Date(itinerary.startDate).toLocaleDateString() %></p>
+                    <p><strong>End Date:</strong> <%= new Date(itinerary.endDate).toLocaleDateString() %></p>
+                    <p><strong>Budget:</strong> $<%= itinerary.budget.toFixed(2) %></p>
+                    <p><strong>Total Cost:</strong> $<%= itinerary.totalCost.toFixed(2) %></p>
+                </div>
+            </div>
+
+            <% if (itinerary.notes) { %>
+                <div style="margin-top: 30px;">
+                    <h3>Notes</h3>
+                    <p><%= itinerary.notes %></p>
+                </div>
+            <% } %>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                <p><strong>Created:</strong> <%= new Date(itinerary.createdAt).toLocaleString() %></p>
+                <p><strong>Last Updated:</strong> <%= new Date(itinerary.updatedAt).toLocaleString() %></p>
+            </div>
+        </div>
+    </div>
+
+    <% if (itinerary.days && itinerary.days.length > 0) { %>
+        <div class="card" style="margin-top: 30px;">
+            <div class="card-header">
+                <h2>Daily Itinerary</h2>
+            </div>
+            <div class="card-content">
+                <div class="itinerary-days">
+                    <% itinerary.days.forEach(day => { %>
+                        <div class="day-card">
+                            <div class="day-header">
+                                <h4>Day <%= day.dayNumber %></h4>
+                                <span><%= new Date(day.date).toLocaleDateString() %></span>
+                            </div>
+                            
+                            <% if (day.activities && day.activities.length > 0) { %>
+                                <div class="day-activities">
+                                    <h5>Activities:</h5>
+                                    <% day.activities.forEach(activity => { %>
+                                        <div class="activity-item">
+                                            <span class="activity-time"><%= activity.time %></span>
+                                            <span class="activity-name"><%= activity.activity %></span>
+                                            <% if (activity.estimatedCost) { %>
+                                                <span>($<%= activity.estimatedCost.toFixed(2) %>)</span>
+                                            <% } %>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            <% } %>
+
+                            <% if (day.accommodation && day.accommodation.name) { %>
+                                <div style="margin-top: 15px;">
+                                    <h5>Accommodation:</h5>
+                                    <p><%= day.accommodation.name %></p>
+                                    <% if (day.accommodation.cost) { %>
+                                        <p>Cost: $<%= day.accommodation.cost.toFixed(2) %></p>
+                                    <% } %>
+                                </div>
+                            <% } %>
+
+                            <% if (day.transportation && day.transportation.length > 0) { %>
+                                <div style="margin-top: 15px;">
+                                    <h5>Transportation:</h5>
+                                    <% day.transportation.forEach(transport => { %>
+                                        <p><%= transport.type %>: <%= transport.from %> → <%= transport.to %></p>
+                                        <% if (transport.cost) { %>
+                                            <p>Cost: $<%= transport.cost.toFixed(2) %></p>
+                                        <% } %>
+                                    <% }); %>
+                                </div>
+                            <% } %>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+        </div>
+    <% } else { %>
+        <div class="card" style="margin-top: 30px;">
+            <div class="card-content">
+                <div style="text-align: center; padding: 40px;">
+                    <i class="fas fa-calendar-plus" style="font-size: 3rem; color: #cbd5e0; margin-bottom: 20px;"></i>
+                    <h3>No Daily Plans Yet</h3>
+                    <p>This itinerary doesn't have any daily plans yet. You can add activities, accommodation, and transportation details.</p>
+                    <a href="/itinerary/<%= itinerary._id %>/edit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Daily Plans
+                    </a>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div> 

@@ -1,0 +1,153 @@
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">Edit Booking</h1>
+        
+        <form method="POST" action="/booking/<%= booking._id %>/edit" class="form">
+            <div class="form-group">
+                <label for="itineraryId">Itinerary</label>
+                <select name="itineraryId" id="itineraryId" required>
+                    <option value="">Select an itinerary</option>
+                    <% if (itineraries && itineraries.length > 0) { %>
+                        <% itineraries.forEach(itinerary => { %>
+                            <option value="<%= itinerary._id %>" <%= booking.itinerary && booking.itinerary._id.toString() === itinerary._id.toString() ? 'selected' : '' %>>
+                                <%= itinerary.title %> - <%= itinerary.destination %>
+                            </option>
+                        <% }); %>
+                    <% } %>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="bookingType">Booking Type</label>
+                <select name="bookingType" id="bookingType" required>
+                    <option value="">Select booking type</option>
+                    <option value="flight" <%= booking.bookingType === 'flight' ? 'selected' : '' %>>Flight</option>
+                    <option value="hotel" <%= booking.bookingType === 'hotel' ? 'selected' : '' %>>Hotel</option>
+                    <option value="activity" <%= booking.bookingType === 'activity' ? 'selected' : '' %>>Activity</option>
+                    <option value="transportation" <%= booking.bookingType === 'transportation' ? 'selected' : '' %>>Transportation</option>
+                    <option value="package" <%= booking.bookingType === 'package' ? 'selected' : '' %>>Package</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="providerName">Provider Name</label>
+                    <input type="text" name="providerName" id="providerName" value="<%= booking.provider.name %>" required>
+                </div>
+                <div class="form-group">
+                    <label for="providerPhone">Provider Phone</label>
+                    <input type="tel" name="providerPhone" id="providerPhone" value="<%= booking.provider.contact.phone || '' %>">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="providerEmail">Provider Email</label>
+                    <input type="email" name="providerEmail" id="providerEmail" value="<%= booking.provider.contact.email || '' %>">
+                </div>
+                <div class="form-group">
+                    <label for="providerWebsite">Provider Website</label>
+                    <input type="url" name="providerWebsite" id="providerWebsite" value="<%= booking.provider.contact.website || '' %>">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="from">From</label>
+                    <input type="text" name="from" id="from" value="<%= booking.details.from || '' %>">
+                </div>
+                <div class="form-group">
+                    <label for="to">To</label>
+                    <input type="text" name="to" id="to" value="<%= booking.details.to || '' %>">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="departureDate">Departure Date</label>
+                    <input type="date" name="departureDate" id="departureDate" value="<%= booking.details.departureDate ? new Date(booking.details.departureDate).toISOString().split('T')[0] : '' %>">
+                </div>
+                <div class="form-group">
+                    <label for="returnDate">Return Date</label>
+                    <input type="date" name="returnDate" id="returnDate" value="<%= booking.details.returnDate ? new Date(booking.details.returnDate).toISOString().split('T')[0] : '' %>">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="departureTime">Departure Time</label>
+                    <input type="time" name="departureTime" id="departureTime" value="<%= booking.details.departureTime || '' %>">
+                </div>
+                <div class="form-group">
+                    <label for="arrivalTime">Arrival Time</label>
+                    <input type="time" name="arrivalTime" id="arrivalTime" value="<%= booking.details.arrivalTime || '' %>">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Duration</label>
+                <input type="text" name="duration" id="duration" value="<%= booking.details.duration || '' %>" placeholder="e.g., 2 hours, 3 days">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="basePrice">Base Price ($)</label>
+                    <input type="number" name="basePrice" id="basePrice" step="0.01" value="<%= booking.pricing.basePrice %>" required>
+                </div>
+                <div class="form-group">
+                    <label for="taxes">Taxes ($)</label>
+                    <input type="number" name="taxes" id="taxes" step="0.01" value="<%= booking.pricing.taxes %>">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fees">Fees ($)</label>
+                    <input type="number" name="fees" id="fees" step="0.01" value="<%= booking.pricing.fees %>">
+                </div>
+                <div class="form-group">
+                    <label for="paymentMethod">Payment Method</label>
+                    <select name="paymentMethod" id="paymentMethod" required>
+                        <option value="">Select payment method</option>
+                        <option value="credit_card" <%= booking.paymentMethod === 'credit_card' ? 'selected' : '' %>>Credit Card</option>
+                        <option value="debit_card" <%= booking.paymentMethod === 'debit_card' ? 'selected' : '' %>>Debit Card</option>
+                        <option value="paypal" <%= booking.paymentMethod === 'paypal' ? 'selected' : '' %>>PayPal</option>
+                        <option value="bank_transfer" <%= booking.paymentMethod === 'bank_transfer' ? 'selected' : '' %>>Bank Transfer</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="status">Status</label>
+                    <select name="status" id="status" required>
+                        <option value="pending" <%= booking.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                        <option value="confirmed" <%= booking.status === 'confirmed' ? 'selected' : '' %>>Confirmed</option>
+                        <option value="cancelled" <%= booking.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                        <option value="completed" <%= booking.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="paymentStatus">Payment Status</label>
+                    <select name="paymentStatus" id="paymentStatus" required>
+                        <option value="pending" <%= booking.paymentStatus === 'pending' ? 'selected' : '' %>>Pending</option>
+                        <option value="paid" <%= booking.paymentStatus === 'paid' ? 'selected' : '' %>>Paid</option>
+                        <option value="refunded" <%= booking.paymentStatus === 'refunded' ? 'selected' : '' %>>Refunded</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="specialRequests">Special Requests</label>
+                <textarea name="specialRequests" id="specialRequests" rows="3" placeholder="Any special requests or notes..."><%= booking.specialRequests || '' %></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Update Booking
+                </button>
+                <a href="/booking/<%= booking._id %>" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div> 

@@ -1,0 +1,13 @@
+# Dependencies
+# This is the folder created by npm/yarn
+node_modules
+
+# Environment variables
+# This file contains secrets and should not be versioned
+.env
+
+# Optional: Other common files to ignore
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

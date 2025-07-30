@@ -1,0 +1,131 @@
+<div class="container">
+    <div class="form-container">
+        <h1 class="form-title">Create New Booking</h1>
+        
+        <form method="POST" action="/booking/create" class="form">
+            <div class="form-group">
+                <label for="itineraryId">Itinerary</label>
+                <select name="itineraryId" id="itineraryId" required>
+                    <option value="">Select an itinerary</option>
+                    <% if (itineraries && itineraries.length > 0) { %>
+                        <% itineraries.forEach(itinerary => { %>
+                            <option value="<%= itinerary._id %>"><%= itinerary.title %> - <%= itinerary.destination %></option>
+                        <% }); %>
+                    <% } %>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="bookingType">Booking Type</label>
+                <select name="bookingType" id="bookingType" required>
+                    <option value="">Select booking type</option>
+                    <option value="flight">Flight</option>
+                    <option value="hotel">Hotel</option>
+                    <option value="activity">Activity</option>
+                    <option value="transportation">Transportation</option>
+                    <option value="package">Package</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="providerName">Provider Name</label>
+                    <input type="text" name="providerName" id="providerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="providerPhone">Provider Phone</label>
+                    <input type="tel" name="providerPhone" id="providerPhone">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="providerEmail">Provider Email</label>
+                    <input type="email" name="providerEmail" id="providerEmail">
+                </div>
+                <div class="form-group">
+                    <label for="providerWebsite">Provider Website</label>
+                    <input type="url" name="providerWebsite" id="providerWebsite">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="from">From</label>
+                    <input type="text" name="from" id="from">
+                </div>
+                <div class="form-group">
+                    <label for="to">To</label>
+                    <input type="text" name="to" id="to">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="departureDate">Departure Date</label>
+                    <input type="date" name="departureDate" id="departureDate">
+                </div>
+                <div class="form-group">
+                    <label for="returnDate">Return Date</label>
+                    <input type="date" name="returnDate" id="returnDate">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="departureTime">Departure Time</label>
+                    <input type="time" name="departureTime" id="departureTime">
+                </div>
+                <div class="form-group">
+                    <label for="arrivalTime">Arrival Time</label>
+                    <input type="time" name="arrivalTime" id="arrivalTime">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="duration">Duration</label>
+                <input type="text" name="duration" id="duration" placeholder="e.g., 2 hours, 3 days">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="basePrice">Base Price ($)</label>
+                    <input type="number" name="basePrice" id="basePrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="taxes">Taxes ($)</label>
+                    <input type="number" name="taxes" id="taxes" step="0.01" value="0">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="fees">Fees ($)</label>
+                    <input type="number" name="fees" id="fees" step="0.01" value="0">
+                </div>
+                <div class="form-group">
+                    <label for="paymentMethod">Payment Method</label>
+                    <select name="paymentMethod" id="paymentMethod" required>
+                        <option value="">Select payment method</option>
+                        <option value="credit_card">Credit Card</option>
+                        <option value="debit_card">Debit Card</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="specialRequests">Special Requests</label>
+                <textarea name="specialRequests" id="specialRequests" rows="3" placeholder="Any special requests or notes..."></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Create Booking
+                </button>
+                <a href="/booking" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div> 
