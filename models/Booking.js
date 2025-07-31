@@ -119,4 +119,5 @@ bookingSchema.methods.calculateTotalPrice = function() {
     return this.pricing.basePrice + this.pricing.taxes + this.pricing.fees;
 };
 
-module.exports = mongoose.model('Booking', bookingSchema); 
+// UPDATED LINE
+module.exports = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);

@@ -188,8 +188,14 @@
 </section>
 
 <script>
+let currentItinerary = null; // To store the generated itinerary data
+
 document.getElementById('ai-form').addEventListener('submit', async function(e) {
     e.preventDefault();
+
+    const button = this.querySelector('button[type="submit"]');
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
     
     const formData = new FormData(this);
     const data = Object.fromEntries(formData);
@@ -206,6 +212,7 @@ document.getElementById('ai-form').addEventListener('submit', async function(e) 
         const result = await response.json();
         
         if (result.success) {
+            currentItinerary = result.itinerary; // Store the full itinerary object
             displayItinerary(result.itinerary);
         } else {
             alert('Error generating itinerary. Please try again.');
@@ -213,22 +220,26 @@ document.getElementById('ai-form').addEventListener('submit', async function(e) 
     } catch (error) {
         console.error('Error:', error);
         alert('Error generating itinerary. Please try again.');
+    } finally {
+        button.disabled = false;
+        button.innerHTML = '<i class="fas fa-magic"></i> Generate AI Itinerary';
     }
 });
 
 function displayItinerary(itinerary) {
     const resultsDiv = document.getElementById('demo-results');
+    const isLoggedIn = <%- JSON.stringify(!!user) %>;
     
     let html = `
         <div class="itinerary-preview">
             <div class="itinerary-header">
-                <h3>${itinerary.destination} Adventure</h3>
+                <h3>${itinerary.title || `${itinerary.destination} Adventure`}</h3>
                 <p>${itinerary.days.length} days • $${itinerary.budget} budget</p>
             </div>
             <div class="itinerary-days">
     `;
     
-    itinerary.days.forEach((day, index) => {
+    itinerary.days.forEach((day) => {
         html += `
             <div class="day-card">
                 <div class="day-header">
@@ -250,11 +261,54 @@ function displayItinerary(itinerary) {
     html += `
             </div>
             <div class="itinerary-actions">
-                <a href="/auth/register" class="btn btn-primary">Save This Itinerary</a>
+                ${isLoggedIn 
+                    ? `<button onclick="saveItinerary()" class="btn btn-primary">Save This Itinerary</button>`
+                    : `<a href="/auth/login" class="btn btn-primary">Login to Save Itinerary</a>`
+                }
             </div>
         </div>
     `;
     
     resultsDiv.innerHTML = html;
 }
-</script> 
+
+async function saveItinerary() {
+    if (!currentItinerary) {
+        alert('No itinerary generated to save.');
+        return;
+    }
+
+    const saveButton = document.querySelector('.itinerary-actions .btn-primary');
+    saveButton.disabled = true;
+    saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+    try {
+        const response = await fetch('/itinerary/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                ...currentItinerary,
+                aiGenerated: true
+            })
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            // Success! Redirect to the new itinerary page.
+            window.location.href = `/itinerary/${result.itinerary._id}`;
+        } else {
+            alert(result.error || 'Failed to save itinerary. Please try again.');
+            saveButton.disabled = false;
+            saveButton.innerHTML = 'Save This Itinerary';
+        }
+    } catch (error) {
+        console.error('Error saving itinerary:', error);
+        alert('An unexpected error occurred while saving. Please try again.');
+        saveButton.disabled = false;
+        saveButton.innerHTML = 'Save This Itinerary';
+    }
+}
+</script>

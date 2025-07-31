@@ -60,23 +60,39 @@ router.get('/create', requireAuth, (req, res) => {
     });
 });
 
-// Create itinerary POST
+// Create itinerary POST - UPDATED
 router.post('/create', requireAuth, async (req, res) => {
     try {
-        const { title, destination, startDate, endDate, budget, travelStyle } = req.body;
-        const itinerary = new Itinerary({
+        const { title, destination, startDate, endDate, budget, travelStyle, days, notes, aiGenerated } = req.body;
+
+        const itineraryData = {
             user: req.session.user.id,
             title,
             destination,
             startDate,
             endDate,
             budget: parseFloat(budget),
-            travelStyle
-        });
+            travelStyle,
+            days: days || [],
+            notes: notes || '',
+            aiGenerated: aiGenerated || (days && days.length > 0)
+        };
+
+        const itinerary = new Itinerary(itineraryData);
+        itinerary.totalCost = itinerary.calculateTotalCost(); // Calculate cost before saving
         await itinerary.save();
+
+        // Handle both AJAX and form submissions
+        if (req.is('application/json')) {
+            return res.status(201).json({ success: true, itinerary: { _id: itinerary._id } });
+        }
+        
         res.redirect(`/itinerary/${itinerary._id}`);
     } catch (error) {
         console.error('Error creating itinerary:', error);
+        if (req.is('application/json')) {
+            return res.status(500).json({ success: false, error: 'Failed to create itinerary' });
+        }
         renderWithLayout(res, 'error', {
             error: 'Failed to create itinerary',
             user: req.session.user,
@@ -84,6 +100,7 @@ router.post('/create', requireAuth, async (req, res) => {
         });
     }
 });
+
 
 // View specific itinerary
 router.get('/:id', requireAuth, async (req, res) => {
@@ -246,4 +263,4 @@ router.get('/api/recent', requireAuth, async (req, res) => {
     }
 });
 
-module.exports = router; 
+module.exports = router;

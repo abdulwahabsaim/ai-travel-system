@@ -79,7 +79,7 @@ const itinerarySchema = new mongoose.Schema({
         transportation: [{
             type: {
                 type: String,
-                enum: ['flight', 'train', 'bus', 'car', 'walking'],
+                enum: ['flight', 'train', 'bus', 'car', 'walking', 'public transport', 'private car', 'taxi', 'bicycle', 'hiking'],
                 required: true
             },
             from: String,
@@ -152,4 +152,5 @@ itinerarySchema.methods.calculateTotalCost = function() {
     return total;
 };
 
-module.exports = mongoose.model('Itinerary', itinerarySchema); 
+// UPDATED LINE
+module.exports = mongoose.models.Itinerary || mongoose.model('Itinerary', itinerarySchema);
