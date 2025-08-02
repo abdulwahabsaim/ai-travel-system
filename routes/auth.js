@@ -69,7 +69,9 @@ router.post('/register', async (req, res) => {
             username: user.username,
             email: user.email,
             firstName: user.firstName,
-            lastName: user.lastName
+            lastName: user.lastName,
+            // ADD ROLE TO SESSION
+            role: user.role
         };
         
         res.redirect('/dashboard');
@@ -116,7 +118,9 @@ router.post('/login', async (req, res) => {
             username: user.username,
             email: user.email,
             firstName: user.firstName,
-            lastName: user.lastName
+            lastName: user.lastName,
+            // ADD ROLE TO SESSION
+            role: user.role
         };
         
         res.redirect('/dashboard');
@@ -136,4 +140,4 @@ router.get('/logout', (req, res) => {
     });
 });
 
-module.exports = router; 
+module.exports = router;

@@ -30,6 +30,12 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    // ADD THE ROLE FIELD
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
     preferences: {
         budget: {
             type: Number,
@@ -68,5 +74,4 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// UPDATED LINE
-module.exports = mongoose.models.User || mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', userSchema);

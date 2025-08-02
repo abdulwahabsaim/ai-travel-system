@@ -72,12 +72,14 @@ const authRoutes = require('./routes/auth');
 const itineraryRoutes = require('./routes/itinerary');
 const bookingRoutes = require('./routes/booking');
 const aiRoutes = require('./routes/ai');
+const adminRoutes = require('./routes/admin'); // <-- IMPORT ADMIN ROUTES
 
 // Use routes
 app.use('/auth', authRoutes);
 app.use('/itinerary', itineraryRoutes);
 app.use('/booking', bookingRoutes);
 app.use('/ai', aiRoutes);
+app.use('/admin', adminRoutes); // <-- USE ADMIN ROUTES
 
 // Home route
 app.get('/', (req, res) => {
@@ -120,4 +122,4 @@ app.use((req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     console.log(`Visit http://localhost:${PORT} to view the application`);
-}); 
+});

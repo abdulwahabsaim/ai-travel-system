@@ -19,8 +19,9 @@ const sampleData = {
             username: 'moiz',
             email: 'moiz@gmail.com',
             password: 'moiz123',
-            firstName: 'abdul',
-            lastName: 'moiz',
+            firstName: 'Abdul',
+            lastName: 'Moiz',
+            role: 'admin', // The only admin
             preferences: {
                 travelStyle: 'adventure',
                 budget: 5000,
@@ -31,12 +32,39 @@ const sampleData = {
             username: 'ali',
             email: 'ali@gmail.com',
             password: 'ali123',
-            firstName: 'ali',
-            lastName: 'arif',
+            firstName: 'Ali',
+            lastName: 'Arif',
+            role: 'user', // Standard user
             preferences: {
                 travelStyle: 'luxury',
                 budget: 10000,
                 preferredDestinations: ['Caribbean', 'Europe']
+            }
+        },
+        {
+            username: 'rehan',
+            email: 'rehan@gmail.com',
+            password: 'rehan123',
+            firstName: 'Rehan',
+            lastName: 'Khan',
+            role: 'user', // Standard user
+            preferences: {
+                travelStyle: 'budget',
+                budget: 2000,
+                preferredDestinations: ['South America', 'Southeast Asia']
+            }
+        },
+        {
+            username: 'wahab',
+            email: 'wahab@gmail.com',
+            password: 'wahab123',
+            firstName: 'Wahab',
+            lastName: 'Saim',
+            role: 'user', // Standard user
+            preferences: {
+                travelStyle: 'cultural',
+                budget: 3500,
+                preferredDestinations: ['Japan', 'Italy']
             }
         }
     ],
@@ -367,8 +395,10 @@ async function seedDatabase() {
         console.log('\n✅ Database seeding completed successfully!');
         console.log(`📊 Created ${createdUsers.length} users, ${createdItineraries.length} itineraries, and ${sampleData.bookings.length} bookings`);
         console.log('\n🔑 Test Login Credentials:');
-        console.log('Email: moiz@gmail.com, Password: moiz123');
-        console.log('Email: ali@gmail.com, Password: ali123');
+        console.log('Admin Email: moiz@gmail.com, Password: moiz123');
+        console.log('User Email: ali@gmail.com, Password: ali123');
+        console.log('User Email: rehan@gmail.com, Password: rehan123');
+        console.log('User Email: wahab@gmail.com, Password: wahab123');
         console.log('\n🚀 You can now test the application with this sample data!');
         
     } catch (error) {
@@ -380,4 +410,4 @@ async function seedDatabase() {
 }
 
 // Run the seed function
-seedDatabase(); 
+seedDatabase();

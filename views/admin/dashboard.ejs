@@ -1,0 +1,30 @@
+<div class="container">
+    <div class="dashboard">
+        <div class="dashboard-header">
+            <h1>Admin Dashboard</h1>
+            <p>Welcome, <%= user.firstName %>. Here's a system overview.</p>
+        </div>
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-number"><%= stats.userCount %></div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><%= stats.itineraryCount %></div>
+                <div class="stat-label">Total Itineraries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number"><%= stats.bookingCount %></div>
+                <div class="stat-label">Total Bookings</div>
+            </div>
+        </div>
+        <div class="dashboard-content">
+            <h2>Quick Management</h2>
+            <div class="dashboard-actions">
+                <a href="/admin/users" class="btn btn-primary"><i class="fas fa-users"></i> Manage Users</a>
+                <a href="/admin/itineraries" class="btn btn-outline"><i class="fas fa-route"></i> Manage Itineraries</a>
+                <a href="/admin/bookings" class="btn btn-outline"><i class="fas fa-calendar-check"></i> Manage Bookings</a>
+            </div>
+        </div>
+    </div>
+</div>

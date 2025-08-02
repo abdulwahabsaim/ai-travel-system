@@ -1,4 +1,5 @@
 const express = require('express');
+const mongoose = require('mongoose'); // <-- ADD THIS LINE
 const Booking = require('../models/Booking');
 const Itinerary = require('../models/Itinerary');
 const router = express.Router();
@@ -138,20 +139,20 @@ router.post('/create', requireAuth, async (req, res) => {
     }
 });
 
-// View specific booking
+// View specific booking - UPDATED
 router.get('/:id', requireAuth, async (req, res) => {
     try {
-        const booking = await Booking.findOne({ 
-            _id: req.params.id, 
-            user: req.session.user.id 
-        }).populate('itinerary');
-        if (!booking) {
+        const booking = await Booking.findById(req.params.id).populate('itinerary');
+        
+        // Security Check: Allow owner or an admin
+        if (!booking || (booking.user.toString() !== req.session.user.id && req.session.user.role !== 'admin')) {
             return renderWithLayout(res, 'error', {
-                error: 'Booking not found',
+                error: 'Booking not found or you do not have permission to view it.',
                 user: req.session.user,
                 title: 'Not Found'
             });
         }
+
         renderWithLayout(res, 'booking/view', {
             title: 'Booking Details',
             user: req.session.user,
@@ -167,20 +168,20 @@ router.get('/:id', requireAuth, async (req, res) => {
     }
 });
 
-// Edit booking page
+// Edit booking page - UPDATED
 router.get('/:id/edit', requireAuth, async (req, res) => {
     try {
-        const booking = await Booking.findOne({ 
-            _id: req.params.id, 
-            user: req.session.user.id 
-        }).populate('itinerary');
-        if (!booking) {
+        const booking = await Booking.findById(req.params.id).populate('itinerary');
+        
+        // Security Check: Allow owner or an admin
+        if (!booking || (booking.user.toString() !== req.session.user.id && req.session.user.role !== 'admin')) {
             return renderWithLayout(res, 'error', {
-                error: 'Booking not found',
+                error: 'Booking not found or you do not have permission to edit it.',
                 user: req.session.user,
                 title: 'Not Found'
             });
         }
+
         const itineraries = await Itinerary.find({ user: req.session.user.id });
         renderWithLayout(res, 'booking/edit', {
             title: 'Edit Booking',
@@ -197,6 +198,7 @@ router.get('/:id/edit', requireAuth, async (req, res) => {
         });
     }
 });
+
 
 // Update booking
 router.post('/:id/edit', requireAuth, async (req, res) => {
@@ -320,6 +322,29 @@ router.post('/:id/status', requireAuth, async (req, res) => {
     }
 });
 
+// API endpoint for USER-SPECIFIC stats (for dashboard)
+router.get('/api/stats', requireAuth, async (req, res) => {
+    try {
+        const bookingStats = await Booking.aggregate([
+            { $match: { user: new mongoose.Types.ObjectId(req.session.user.id) } },
+            {
+                $group: {
+                    _id: null,
+                    bookingCount: { $sum: 1 },
+                    totalSpent: { $sum: "$pricing.totalPrice" }
+                }
+            }
+        ]);
+
+        const stats = bookingStats[0] || { bookingCount: 0, totalSpent: 0 };
+        res.json({ success: true, ...stats });
+
+    } catch (error) {
+        console.error('Error fetching booking stats:', error);
+        res.status(500).json({ error: 'Failed to fetch booking stats' });
+    }
+});
+
 // API endpoint for recent bookings (for dashboard)
 router.get('/api/recent', requireAuth, async (req, res) => {
     try {
@@ -336,4 +361,4 @@ router.get('/api/recent', requireAuth, async (req, res) => {
     }
 });
 
-module.exports = router; 
+module.exports = router;

@@ -26,6 +26,12 @@
                     <a href="/dashboard" class="nav-link">Dashboard</a>
                     <a href="/itinerary" class="nav-link">Itineraries</a>
                     <a href="/booking" class="nav-link">Bookings</a>
+                    
+                    <!-- PROMINENT ADMIN LINK IN MAIN NAV -->
+                    <% if (user.role === 'admin') { %>
+                        <a href="/admin" class="nav-link" style="color: #ffd700; font-weight: bold; border: 1px solid #ffd700; padding: 5px 10px; border-radius: 5px;">Admin Panel</a>
+                    <% } %>
+
                     <div class="nav-dropdown">
                         <button class="nav-dropdown-btn">
                             <i class="fas fa-user"></i>
@@ -34,6 +40,12 @@
                         </button>
                         <div class="nav-dropdown-content">
                             <a href="/dashboard">Dashboard</a>
+                            
+                            <!-- ADMIN LINK IN DROPDOWN FOR CONSISTENCY -->
+                            <% if (user.role === 'admin') { %>
+                                <a href="/admin" style="color: #667eea; font-weight: bold;">Admin Panel</a>
+                            <% } %>
+
                             <a href="/auth/logout">Logout</a>
                         </div>
                     </div>
@@ -82,11 +94,11 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 AI Travel System. All rights reserved.</p>
+                <p>© 2024 AI Travel System. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script src="/js/main.js"></script>
 </body>
-</html> 
+</html>

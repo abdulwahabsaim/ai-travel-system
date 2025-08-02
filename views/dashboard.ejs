@@ -6,10 +6,10 @@
             <p>Here's your travel overview and quick actions</p>
         </div>
         <div class="dashboard-stats">
-            <div class="stat-card"><div id="itinerary-count" class="stat-number">-</div><div class="stat-label">Itineraries</div></div>
-            <div class="stat-card"><div id="booking-count" class="stat-number">-</div><div class="stat-label">Bookings</div></div>
-            <div class="stat-card"><div id="total-spent" class="stat-number">$0</div><div class="stat-label">Total Spent</div></div>
-            <div class="stat-card"><div id="upcoming-trips" class="stat-number">-</div><div class="stat-label">Upcoming Trips</div></div>
+            <div class="stat-card"><div id="itinerary-count" class="stat-number">...</div><div class="stat-label">Itineraries</div></div>
+            <div class="stat-card"><div id="booking-count" class="stat-number">...</div><div class="stat-label">Bookings</div></div>
+            <div class="stat-card"><div id="total-spent" class="stat-number">...</div><div class="stat-label">Total Spent</div></div>
+            <div class="stat-card"><div id="upcoming-trips" class="stat-number">...</div><div class="stat-label">Upcoming Trips</div></div>
         </div>
         <div class="dashboard-actions">
             <a href="/itinerary/create" class="btn btn-primary"><i class="fas fa-plus"></i> Create Itinerary</a>
@@ -100,39 +100,54 @@
 </div>
 
 <script>
-// This entire script block is unchanged from the previous version.
-// It already correctly handles all 6 features.
-
+// UPDATED SCRIPT
 document.addEventListener('DOMContentLoaded', () => {
+    // Fetch total stats for the logged-in user
+    const loadStats = () => {
+        // Fetch Itinerary Stats
+        fetch('/itinerary/api/stats').then(res => res.json()).then(data => {
+            if (data.success) {
+                document.getElementById('itinerary-count').textContent = data.itineraryCount || 0;
+                document.getElementById('upcoming-trips').textContent = data.upcomingCount || 0;
+            }
+        });
+
+        // Fetch Booking Stats
+        fetch('/booking/api/stats').then(res => res.json()).then(data => {
+            if (data.success) {
+                document.getElementById('booking-count').textContent = data.bookingCount || 0;
+                document.getElementById('total-spent').textContent = `$${(data.totalSpent || 0).toLocaleString()}`;
+            }
+        });
+    };
+
+    // Fetch recent items for the dashboard lists
     const loadRecentData = () => {
         fetch('/itinerary/api/recent').then(res => res.json()).then(data => {
             const container = document.getElementById('recent-itineraries');
             if (data.success && data.itineraries.length) {
                 container.innerHTML = data.itineraries.map(it => `<div class="list-item"><div><h4>${it.title}</h4><p>${it.destination}</p></div><a href="/itinerary/${it._id}" class="btn btn-sm btn-outline">View</a></div>`).join('');
             } else { container.innerHTML = '<p style="padding: 20px; text-align: center;">No recent itineraries found.</p>'; }
-            document.getElementById('itinerary-count').textContent = data.itineraries.length || 0;
         });
         fetch('/booking/api/recent').then(res => res.json()).then(data => {
             const container = document.getElementById('recent-bookings');
             if (data.success && data.bookings.length) {
                 container.innerHTML = data.bookings.map(b => `<div class="list-item"><div><h4>${b.bookingType} Booking</h4><p>${b.provider.name} - $${b.pricing.totalPrice}</p></div><a href="/booking/${b._id}" class="btn btn-sm btn-outline">View</a></div>`).join('');
-                const totalSpent = data.bookings.reduce((sum, b) => sum + b.pricing.totalPrice, 0);
-                document.getElementById('total-spent').textContent = `$${totalSpent.toLocaleString()}`;
             } else { container.innerHTML = '<p style="padding: 20px; text-align: center;">No recent bookings found.</p>'; }
-            document.getElementById('booking-count').textContent = data.bookings.length || 0;
         });
     };
+    
+    loadStats();
     loadRecentData();
 });
 
+// The AI assistant part of the script remains unchanged
 const resultsContainer = document.getElementById('ai-results-container');
-
 function showResultState(message, isError = false) {
     resultsContainer.style.display = 'block';
     resultsContainer.className = isError ? 'ai-results-container error-text' : 'ai-results-container loading-text';
     resultsContainer.innerHTML = `<h3>${message}</h3>`;
 }
-
 async function fetchAI(endpoint, body) {
     try {
         const response = await fetch(`/ai${endpoint}`, {
@@ -146,7 +161,6 @@ async function fetchAI(endpoint, body) {
         return null;
     }
 }
-
 async function getRecommendations() {
     showResultState('<i class="fas fa-spinner fa-spin"></i> Getting Recommendations...');
     const data = await fetchAI('/get-recommendations', { preferences: { travelStyle: "adventure" } });
@@ -158,7 +172,6 @@ async function getRecommendations() {
         resultsContainer.className = 'ai-results-container'; resultsContainer.innerHTML = html;
     } else if (data) { showResultState('Could not generate recommendations.', true); }
 }
-
 async function predictCosts() {
     const destination = document.getElementById('cost-destination').value;
     const duration = document.getElementById('cost-duration').value;
@@ -171,7 +184,6 @@ async function predictCosts() {
         resultsContainer.innerHTML = `<h3>Cost Prediction for ${cost.destination}</h3><div class="result-item"><h4>Total Estimated Cost: $${cost.totalCost}</h4><p>Daily Average: $${cost.dailyBreakdown.total}</p></div>`;
     } else if (data) { showResultState('Could not predict costs.', true); }
 }
-
 async function getWeather() {
     const destination = document.getElementById('weather-destination').value;
     const date = document.getElementById('weather-date').value;
@@ -184,7 +196,6 @@ async function getWeather() {
         resultsContainer.innerHTML = `<h3>Weather for ${w.destination}</h3><div class="result-item"><h4>${w.weatherForecast[0].conditions.description}</h4><p>Temperature: ${w.weatherForecast[0].temperature.low}° to ${w.weatherForecast[0].temperature.high}°</p></div><div class="result-item"><h4>Packing Tips:</h4><ul>${w.packingRecommendations.clothing.map(i => `<li>${i}</li>`).join('')}</ul></div>`;
     } else if (data) { showResultState('Could not get weather insights.', true); }
 }
-
 async function translateText() {
     const text = document.getElementById('translate-text').value;
     const lang = document.getElementById('translate-language').value;
@@ -197,11 +208,10 @@ async function translateText() {
         resultsContainer.innerHTML = `<h3>Translation to ${t.languageInfo.name}</h3><div class="result-item"><h4>${t.translatedText}</h4><p><em>(Original: ${t.originalText})</em></p></div>`;
     } else if (data) { showResultState('Could not translate text.', true); }
 }
-
 async function optimizeBudget() {
     const totalBudget = document.getElementById('budget-total').value;
-    const destination = document.getElementById('budget-destination').value;
     const duration = document.getElementById('budget-duration').value;
+    const destination = document.getElementById('budget-destination').value;
     if (!totalBudget || !destination || !duration) { alert('Please fill all budget fields.'); return; }
     showResultState('<i class="fas fa-spinner fa-spin"></i> Optimizing Budget...');
     const data = await fetchAI('/optimize-budget', { totalBudget, destination, duration });
@@ -211,7 +221,6 @@ async function optimizeBudget() {
         resultsContainer.innerHTML = `<h3>Budget Plan for ${opt.destination}</h3><div class="result-item"><h4>Daily Budget: $${opt.dailyBudget}</h4><ul><li>Accommodation: $${opt.categoryAllocation.accommodation}</li><li>Food: $${opt.categoryAllocation.food}</li><li>Activities: $${opt.categoryAllocation.activities}</li></ul></div>`;
     } else if (data) { showResultState('Could not optimize budget.', true); }
 }
-
 async function getTravelTips() {
     const destination = document.getElementById('tips-destination').value;
     const travelStyle = document.getElementById('tips-style').value;
